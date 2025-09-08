@@ -5,10 +5,9 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, True)
 )
 
-# .env faylni o‘qish
 environ.Env.read_env()
 
 # Security
