@@ -8,26 +8,24 @@ from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from users.models import CustomUser
 from .serializers import RegisterSerializer, LoginSerializer, VerifyEmailSerializer
 from .permissions import IsAuthenticated
-
 
 
 def generate_verification_code():
     return str(secrets.randbelow(1000000)).zfill(6)
 
 
-def send_verification_email(user):
+def send_verification_email(email, code):
     mail_subject = "Your Registration Verification Code"
-    message = f"Hello {user.email},\n\nYour verification code is: {user.verification_code}"
-    email = EmailMessage(
+    message = f"Hello {email},\n\nYour verification code is: {code}"
+    email_obj = EmailMessage(
         mail_subject,
         message,
         settings.EMAIL_HOST_USER,
-        [user.email],
+        [email],
     )
-    email.send()
+    email_obj.send()
 
 
 @extend_schema(tags=['Auth'])
@@ -37,38 +35,13 @@ class RegisterAPIView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            user.is_active = False
-            user.verification_code = generate_verification_code()
-            user.save()
-            send_verification_email(user)
+            verification = serializer.save()
+            send_verification_email(verification.email, verification.code)
             return Response(
-                {"message": "User registered successfully. Check your email for verification."},
+                {"message": "Verification code sent to your email."},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-# @extend_schema(tags=['Auth'])
-# class EmailPageAPIView(APIView):
-#     permission_classes = [permissions.AllowAny]
-#
-#     def get(self, request):
-#         email = request.query_params.get("email")
-#         if not email:
-#             return Response({"error": "Email query param required"}, status=status.HTTP_400_BAD_REQUEST)
-#
-#         try:
-#             user = CustomUser.objects.get(email=email)
-#             return Response(
-#                 {
-#                     "user_email": user.email,
-#                     "verification_code": user.verification_code,
-#                 },
-#                 status=status.HTTP_200_OK,
-#             )
-#         except CustomUser.DoesNotExist:
-#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @extend_schema(tags=['Auth'])
@@ -78,18 +51,11 @@ class VerifyEmailAPIView(APIView):
     def post(self, request):
         serializer = VerifyEmailSerializer(data=request.data)
         if serializer.is_valid():
-            email = serializer.validated_data["email"]
-            code = serializer.validated_data["verification_code"]
-
-            try:
-                user = CustomUser.objects.get(email=email, verification_code=code)
-                user.is_active = True
-                user.verification_code = ""
-                user.save()
-                return Response({"message": "Email verified successfully!"}, status=status.HTTP_200_OK)
-            except CustomUser.DoesNotExist:
-                return Response({"message": "Invalid verification code!"}, status=status.HTTP_400_BAD_REQUEST)
-
+            user = serializer.save()
+            return Response(
+                {"message": "Email verified successfully! You can now log in."},
+                status=status.HTTP_200_OK,
+            )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 

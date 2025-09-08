@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 
 
 class CustomUserManager(BaseUserManager):
@@ -14,13 +15,13 @@ class CustomUserManager(BaseUserManager):
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        extra_fields.setdefault('is_active', True)
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        extra_fields.setdefault("is_active", True)
 
-        if extra_fields.get('is_staff') is not True:
+        if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True")
-        if extra_fields.get('is_superuser') is not True:
+        if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True")
 
         return self.create_user(email, password, **extra_fields)
@@ -34,7 +35,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_staff = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
-    verification_code = models.CharField(max_length=6, blank=True, null=True)
 
     objects = CustomUserManager()
 
@@ -43,3 +43,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class EmailVerification(models.Model):
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    first_name = models.CharField(max_length=30, blank=True, null=True)
+    last_name = models.CharField(max_length=30, blank=True, null=True)
+    password = models.CharField(max_length=128)  # hashed password
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timedelta(minutes=10)
+
+    def __str__(self):
+        return f"{self.email} - {self.code}"
