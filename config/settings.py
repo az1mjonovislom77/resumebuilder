@@ -8,10 +8,12 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
+# .env faylni o‘qish
 environ.Env.read_env()
 
-SECRET_KEY='django-insecure-_*l=l9%h8+*(_8z%^15%5_%yzvss^$6h3rrg)-m^&1rz_!kzts'
-DEBUG = True
+# Security
+SECRET_KEY = env("SECRET_KEY", default="change-me")
+DEBUG = env("DEBUG", default=False)
 
 ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
 
@@ -25,11 +27,15 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Local apps
     'users.apps.UsersConfig',
+    'resume',
+
+    # Third-party
     'social_django',
     'rest_framework',
     'rest_framework_simplejwt',
-    'resume',
     'drf_spectacular',
 ]
 
@@ -62,28 +68,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
+# Database
 DATABASES = {
-    'default': env.db()
+    'default': env.db("DATABASE_URL")
 }
 
-# Password validation
-# https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
-
+# Password validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# DRF
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -94,41 +92,50 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
+# Localization
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'Asia/Tashkent'
-
 USE_I18N = True
-
 USE_TZ = True
 
-STATIC_URL = 'static/'
-
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Static & Media
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'images/media'
 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Authentication backends
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.github.GithubOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GITHUB_KEY = os.getenv("SOCIAL_AUTH_GITHUB_KEY")
-SOCIAL_AUTH_GITHUB_SECRET = os.getenv("SOCIAL_AUTH_GITHUB_SECRET")
+# Social auth (ENV orqali boshqariladi)
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", default="")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", default="")
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = "http://127.0.0.1:8000/complete/google/"
-SOCIAL_AUTH_GITHUB_REDIRECT_URI = "http://127.0.0.1:8000/social-auth/complete/github/"
+SOCIAL_AUTH_GITHUB_KEY = env("SOCIAL_AUTH_GITHUB_KEY", default="")
+SOCIAL_AUTH_GITHUB_SECRET = env("SOCIAL_AUTH_GITHUB_SECRET", default="")
 
-SOCIAL_AUTH_GITHUB_SCOPE = ['users:email']
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI = env(
+    "GOOGLE_REDIRECT_URI",
+    default="http://127.0.0.1:8000/complete/google/"
+)
+SOCIAL_AUTH_GITHUB_REDIRECT_URI = env(
+    "GITHUB_REDIRECT_URI",
+    default="http://127.0.0.1:8000/social-auth/complete/github/"
+)
 
+SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
+# Email
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'azimjonovislomjon77@gmail.com'
-EMAIL_HOST_PASSWORD = 'ayci qbmm jcin teap'
+EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
+EMAIL_HOST_PASSWORD='ayci qbmm jcin teap'
