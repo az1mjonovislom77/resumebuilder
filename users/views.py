@@ -49,26 +49,26 @@ class RegisterAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@extend_schema(tags=['Auth'])
-class EmailPageAPIView(APIView):
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request):
-        email = request.query_params.get("email")
-        if not email:
-            return Response({"error": "Email query param required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            user = CustomUser.objects.get(email=email)
-            return Response(
-                {
-                    "user_email": user.email,
-                    "verification_code": user.verification_code,
-                },
-                status=status.HTTP_200_OK,
-            )
-        except CustomUser.DoesNotExist:
-            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+# @extend_schema(tags=['Auth'])
+# class EmailPageAPIView(APIView):
+#     permission_classes = [permissions.AllowAny]
+#
+#     def get(self, request):
+#         email = request.query_params.get("email")
+#         if not email:
+#             return Response({"error": "Email query param required"}, status=status.HTTP_400_BAD_REQUEST)
+#
+#         try:
+#             user = CustomUser.objects.get(email=email)
+#             return Response(
+#                 {
+#                     "user_email": user.email,
+#                     "verification_code": user.verification_code,
+#                 },
+#                 status=status.HTTP_200_OK,
+#             )
+#         except CustomUser.DoesNotExist:
+#             return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
 
 @extend_schema(tags=['Auth'])
