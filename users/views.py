@@ -2,7 +2,7 @@ import secrets
 from django.core.mail import EmailMessage
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
-
+from django.db import IntegrityError
 from rest_framework.views import APIView
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -35,7 +35,13 @@ class RegisterAPIView(APIView):
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            verification = serializer.save()
+            try:
+                verification = serializer.save()
+            except IntegrityError:
+                return Response(
+                    {"error": "This email is already registered."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             send_verification_email(verification.email, verification.code)
             return Response(
                 {"message": "Verification code sent to your email."},
