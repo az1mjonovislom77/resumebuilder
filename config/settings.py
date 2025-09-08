@@ -1,11 +1,15 @@
 from pathlib import Path
 import os
+import environ
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-_*l=l9%h8+*(_8z%^15%5_%yzvss^$6h3rrg)-m^&1rz_!kzts'
+env = environ.Env(
+    DEBUG=(bool, False)
+)
 
-DEBUG = True
+SECRET_KEY = env('SECRET_KEY')
+DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 
@@ -27,7 +31,6 @@ INSTALLED_APPS = [
     'drf_spectacular',
 ]
 
-
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -37,7 +40,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
 
 ROOT_URLCONF = 'config.urls'
 
@@ -56,17 +58,10 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env.db()
 }
 
 # Password validation
@@ -135,6 +130,8 @@ CACHES = {
         }
     }
 }
+
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
