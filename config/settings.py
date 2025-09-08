@@ -8,7 +8,9 @@ env = environ.Env(
     DEBUG=(bool, True)
 )
 
-environ.Env.read_env()
+
+environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
 
 # Security
 SECRET_KEY = env("SECRET_KEY", default="change-me")
