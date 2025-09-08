@@ -123,15 +123,6 @@ SOCIAL_AUTH_GITHUB_REDIRECT_URI = "http://127.0.0.1:8000/social-auth/complete/gi
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['users:email']
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379/1',
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-        }
-    }
-}
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
