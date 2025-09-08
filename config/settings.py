@@ -10,7 +10,7 @@ env = environ.Env(
 
 environ.Env.read_env()
 
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY='django-insecure-_*l=l9%h8+*(_8z%^15%5_%yzvss^$6h3rrg)-m^&1rz_!kzts'
 DEBUG = True
 
 ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
