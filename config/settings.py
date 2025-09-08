@@ -13,7 +13,7 @@ environ.Env.read_env()
 SECRET_KEY = env('SECRET_KEY')
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [".railway.app", "localhost", "127.0.0.1"]
 
 # Custom user
 AUTH_USER_MODEL = 'users.CustomUser'
