@@ -138,10 +138,10 @@ SOCIAL_AUTH_GITHUB_REDIRECT_URI = env(
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
-# Email
+
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD='ayci qbmm jcin teap'
+EMAIL_HOST_PASSWORD='dlmlfdolokvvkwtd'
