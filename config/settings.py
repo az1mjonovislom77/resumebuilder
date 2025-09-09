@@ -13,7 +13,7 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 SECRET_KEY = 'zfa*)0=_a%8$@31wq_^&q9x0(@#jelg*@uq6yhma(=j(55wc3='
 DEBUG = True
 
-ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["*", "https://resumebuilder-production-6887.up.railway.app", "localhost", "127.0.0.1"]
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -46,7 +46,6 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    'https://resumebuilder-production-6887.up.railway.app/'
 ]
 
 ROOT_URLCONF = 'config.urls'
