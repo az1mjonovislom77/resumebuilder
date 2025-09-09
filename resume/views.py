@@ -15,7 +15,7 @@ from .serializers import (
     SkillSerializer,
     LanguageSerializer,
     TemplateSerializer,
-    ThemeSerializer,
+    ThemeSerializer, TemplateDetailSerializer,
 )
 
 
@@ -271,7 +271,7 @@ class TemplateDetail(APIView):
             template = Template.objects.get(pk=pk)
         except Template.DoesNotExist:
             return Response({"error": "Template not found"}, status=404)
-        serializer = TemplateSerializer(template)
+        serializer = TemplateDetailSerializer(template)
         return Response(serializer.data)
 
     def put(self, request, pk):
