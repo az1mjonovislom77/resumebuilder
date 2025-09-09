@@ -7,7 +7,7 @@ from rest_framework.views import APIView
 from rest_framework import status, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
-
+from social_django.utils import load_strategy, load_backend
 from .serializers import RegisterSerializer, LoginSerializer, VerifyEmailSerializer, ResetPasswordSerializer, \
     ForgotPasswordSerializer
 from .permissions import IsAuthenticated
@@ -28,9 +28,11 @@ def send_verification_email(email, code):
     )
     email_obj.send()
 
+
 @extend_schema(tags=['Auth'])
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
@@ -109,3 +111,37 @@ class ResetPasswordAPIView(APIView):
             serializer.save()
             return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@extend_schema(tags=['Auth'])
+class SocialLoginURLsAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        from django.urls import reverse
+        return Response({
+            "google_login_url": request.build_absolute_uri(
+                reverse('social:begin', kwargs={'backend': 'google-oauth2'})),
+            "github_login_url": request.build_absolute_uri(reverse('social:begin', kwargs={'backend': 'github'})),
+        })
+
+
+@extend_schema(tags=['Auth'])
+class SocialLoginCompleteAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, backend, *args, **kwargs):
+        strategy = load_strategy(request)
+        social_backend = load_backend(strategy, backend, None)
+        try:
+            user = social_backend.do_auth(request.GET.get('code'), request=request)
+            if user and user.is_active:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

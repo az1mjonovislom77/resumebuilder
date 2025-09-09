@@ -3,7 +3,7 @@ from .views import (
     RegisterAPIView,
     VerifyEmailAPIView,
     LoginAPIView,
-    LogoutAPIView, ForgotPasswordAPIView, ResetPasswordAPIView,
+    LogoutAPIView, ForgotPasswordAPIView, ResetPasswordAPIView, SocialLoginURLsAPIView, SocialLoginCompleteAPIView,
 )
 
 app_name = "users"
@@ -15,4 +15,6 @@ urlpatterns = [
     path("logout/", LogoutAPIView.as_view(), name="logout"),
     path('forgot-password/', ForgotPasswordAPIView.as_view(), name='forgot-password'),
     path('reset-password/', ResetPasswordAPIView.as_view(), name='reset-password'),
+    path('social-login-urls/', SocialLoginURLsAPIView.as_view(), name='social_login_urls'),
+    path('complete/<str:backend>/', SocialLoginCompleteAPIView.as_view(), name='social_complete'),
 ]
