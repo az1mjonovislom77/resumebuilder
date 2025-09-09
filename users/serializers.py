@@ -52,7 +52,7 @@ class RegisterSerializer(serializers.Serializer):
             "Kod 10 daqiqa davomida amal qiladi."
         )
         email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [email])
-        email_obj.send(fail_silently=False)
+        email_obj.send(fail_silently=True)
 
         return verification
 
