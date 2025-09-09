@@ -48,6 +48,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+CSRF_TRUSTED_ORIGINS = ['https://resumebuilder-production-6887.up.railway.app']
+
 ROOT_URLCONF = 'config.urls'
 
 TEMPLATES = [
