@@ -10,13 +10,11 @@ env = environ.Env(
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# Security
 SECRET_KEY = env("SECRET_KEY", default="change-me")
 DEBUG = env("DEBUG", default=False)
 
 ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
 
-# Custom user
 AUTH_USER_MODEL = 'users.CustomUser'
 
 INSTALLED_APPS = [
@@ -26,12 +24,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Local apps
     'users.apps.UsersConfig',
     'resume',
-
-    # Third-party
     'social_django',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -74,12 +68,12 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
+
 DATABASES = {
     'default': env.db("DATABASE_URL")
 }
 
-# Password validators
+
 AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
     {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
@@ -87,7 +81,7 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# DRF
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -98,13 +92,11 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# Localization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Tashkent'
 USE_I18N = True
 USE_TZ = True
 
-# Static & Media
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
@@ -137,8 +129,8 @@ SOCIAL_AUTH_GITHUB_REDIRECT_URI = env(
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
-LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = '/'  # logindan keyin redirect
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/ '
 LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
