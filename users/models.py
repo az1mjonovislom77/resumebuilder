@@ -50,7 +50,7 @@ class EmailVerification(models.Model):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=30, blank=True, null=True)
-    password = models.CharField(max_length=128)  # hashed password
+    password = models.CharField(max_length=128)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
 
