@@ -46,7 +46,6 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    ".railway.app"
 ]
 
 ROOT_URLCONF = 'config.urls'
