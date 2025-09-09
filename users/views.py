@@ -11,7 +11,8 @@ from social_django.utils import load_strategy, load_backend
 from .serializers import RegisterSerializer, LoginSerializer, VerifyEmailSerializer, ResetPasswordSerializer, \
     ForgotPasswordSerializer
 from .permissions import IsAuthenticated
-
+from django.shortcuts import redirect
+from urllib.parse import urlencode
 
 def generate_verification_code():
     return str(secrets.randbelow(1000000)).zfill(6)
@@ -138,12 +139,13 @@ class SocialLoginCompleteAPIView(APIView):
             user = social_backend.do_auth(code, state=state, request=request)
             if user and user.is_active:
                 refresh = RefreshToken.for_user(user)
-                return Response({
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh),
-                }, status=status.HTTP_200_OK)
+                params = urlencode({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                })
+                frontend_url = f"http://localhost:5173/oauth/callback?{params}"
+                return redirect(frontend_url)
             else:
                 return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-
