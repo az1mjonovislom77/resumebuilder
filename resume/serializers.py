@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import UserInfo, Work, Education, Skill, Language, Template, Theme
 
+
 class UserInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserInfo
@@ -35,6 +36,7 @@ class TemplateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Template
         fields = ["id", "name", "description", "selected", "image"]
+
 
 class TemplateDetailSerializer(serializers.ModelSerializer):
     class Meta:

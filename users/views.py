@@ -95,6 +95,7 @@ class LogoutAPIView(APIView):
     def post(self, request):
         return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
 
+
 @extend_schema(tags=['Auth'])
 class ForgotPasswordAPIView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -117,4 +118,3 @@ class ResetPasswordAPIView(APIView):
             serializer.save()
             return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
