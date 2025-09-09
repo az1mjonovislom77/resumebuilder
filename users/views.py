@@ -132,39 +132,20 @@ class SocialLoginCompleteAPIView(APIView):
     def get(self, request, backend, *args, **kwargs):
         strategy = load_strategy(request)
         social_backend = load_backend(strategy, backend, None)
-
-        code = request.GET.get('code')
-        state = request.GET.get('state')
-
-        print(f"Received code: {code}")
-        print(f"Received state: {state}")
-
         try:
-            user = social_backend.do_auth(code, state=state, request=request)
-
-            print(f"User from social auth: {user}")
-            if user:
-                print(f"Is user active? {user.is_active}")
-
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            user = social_backend.do_auth(code, state=state)
             if user and user.is_active:
                 refresh = RefreshToken.for_user(user)
-
-                print(f"Access token: {refresh.access_token}")
-                print(f"Refresh token: {refresh}")
-
-                params = urlencode({
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh),
-                })
-
-                frontend_url = f"http://localhost:5173/oauth/callback?{params}"
-                print(f"Redirecting to: {frontend_url}")
-
+                # params = urlencode({
+                #     'access': str(refresh.access_token),
+                #     'refresh': str(refresh),
+                # })
+                # frontend_url = f"http://localhost:5173/oauth/callback?{params}"
+                frontend_url = f"http://localhost:5173/?access={str(refresh.access_token)}&refresh={str(refresh)}"
                 return redirect(frontend_url)
-
             else:
-                return Response({"error": "Authentication failed or inactive user"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            print(f"Error during social login: {e}")
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
-

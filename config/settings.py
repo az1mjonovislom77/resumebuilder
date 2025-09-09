@@ -144,7 +144,7 @@ GITHUB_REDIRECT_URI = env(
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
 LOGIN_URL = '/login/'
-LOGIN_REDIRECT_URL = 'http://localhost:5173/oauth/callback'
+LOGIN_REDIRECT_URL = 'http://localhost:5173'
 LOGOUT_REDIRECT_URL = 'http://localhost:5173'
 
 EMAIL_BACKEND='django.core.mail.backends.smtp.EmailBackend'
