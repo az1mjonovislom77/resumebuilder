@@ -5,6 +5,7 @@ from rest_framework import serializers
 from users.models import CustomUser, EmailVerification, PasswordResetCode
 from django.core.mail import EmailMessage
 
+
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     phone_number = serializers.CharField(required=False, allow_blank=True)
@@ -22,18 +23,41 @@ class RegisterSerializer(serializers.Serializer):
         password = validated_data.pop("password")
         validated_data.pop("password2", None)
 
-        code = str(secrets.randbelow(1000000)).zfill(6)
+        verification = None
+        code = None
 
-        verification = EmailVerification.objects.create(
-            email=validated_data["email"],
-            phone_number=validated_data.get("phone_number"),
-            first_name=validated_data.get("first_name"),
-            last_name=validated_data.get("last_name"),
-            password=make_password(password),  # hashed saqlash
-            code=code,
-        )
+        existing_verification = EmailVerification.objects.filter(email=validated_data["email"]).first()
 
-        # bu joyda email yuborishingiz mumkin: send_mail("Verification code", code, ...)
+        if existing_verification:
+            if existing_verification.is_expired():
+                existing_verification.delete()
+                code = str(secrets.randbelow(1000000)).zfill(6)
+                verification = EmailVerification.objects.create(
+                    email=validated_data["email"],
+                    phone_number=validated_data.get("phone_number"),
+                    first_name=validated_data.get("first_name"),
+                    last_name=validated_data.get("last_name"),
+                    password=make_password(password),
+                    code=code,
+                )
+            else:
+                code = existing_verification.code
+                verification = existing_verification
+        else:
+            code = str(secrets.randbelow(1000000)).zfill(6)
+            verification = EmailVerification.objects.create(
+                email=validated_data["email"],
+                phone_number=validated_data.get("phone_number"),
+                first_name=validated_data.get("first_name"),
+                last_name=validated_data.get("last_name"),
+                password=make_password(password),
+                code=code,
+            )
+        mail_subject = "Your Registration Verification Code"
+        message = f"Hello {validated_data['email']},\n\nYour verification code is: {code}"
+        email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [validated_data['email']])
+        email_obj.send()
+
         return verification
 
 
@@ -61,7 +85,7 @@ class VerifyEmailSerializer(serializers.Serializer):
             phone_number=verification.phone_number,
             first_name=verification.first_name,
             last_name=verification.last_name,
-            password=verification.password,  # bu allaqachon hashed
+            password=verification.password,
             is_active=True,
         )
 
@@ -103,10 +127,16 @@ class ForgotPasswordSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         user = validated_data["user"]
-        code = str(secrets.randbelow(1000000)).zfill(6)
-        PasswordResetCode.objects.create(user=user, code=code)
+        existing_code = PasswordResetCode.objects.filter(user=user).first()
 
-        # email yuborish
+        if existing_code and not existing_code.is_expired():
+            code = existing_code.code
+        else:
+            if existing_code:
+                existing_code.delete()
+            code = str(secrets.randbelow(1000000)).zfill(6)
+            PasswordResetCode.objects.create(user=user, code=code)
+
         mail_subject = "Password Reset Code"
         message = f"Hello {user.email},\n\nYour password reset code is: {code}"
         email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [user.email])
@@ -144,8 +174,6 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.set_password(validated_data["new_password"])
         user.save()
 
-        # ishlatilgan kodni o'chirish
         validated_data["code_obj"].delete()
 
         return {"message": "Parol muvaffaqiyatli yangilandi."}
-
