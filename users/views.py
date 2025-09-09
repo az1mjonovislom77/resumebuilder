@@ -30,7 +30,7 @@ def send_verification_email(email, code):
 
 
 class RegisterAPIView(APIView):
-    permissions_classes = [AllowAny]
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
