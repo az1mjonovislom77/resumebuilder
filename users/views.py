@@ -28,7 +28,7 @@ def send_verification_email(email, code):
     )
     email_obj.send()
 
-
+@extend_schema(tags=['Auth'])
 class RegisterAPIView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
