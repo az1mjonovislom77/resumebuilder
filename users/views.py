@@ -2,7 +2,6 @@ import secrets
 from django.core.mail import EmailMessage
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
-from django.db import IntegrityError
 from rest_framework.views import APIView
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -29,26 +28,16 @@ def send_verification_email(email, code):
     email_obj.send()
 
 
-@extend_schema(tags=['Auth'])
 class RegisterAPIView(APIView):
-    permission_classes = [permissions.AllowAny]
-
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
-            try:
-                verification = serializer.save()
-            except IntegrityError:
-                return Response(
-                    {"error": "This email is already registered"},
-                    status=status.HTTP_400_BAD_REQUEST
-                )
-            send_verification_email(verification.email, verification.code)
-            return Response(
-                {"message": "Verification code sent to your email"},
-                status=status.HTTP_201_CREATED,
-            )
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            verification = serializer.save()
+            return Response({
+                "message": "Tasdiqlash kodi sizning emailingizga yuborildi. Iltimos, kodni kiriting va ro‘yxatdan o‘ting."
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @extend_schema(tags=['Auth'])

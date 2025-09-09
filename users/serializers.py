@@ -11,52 +11,48 @@ class RegisterSerializer(serializers.Serializer):
     phone_number = serializers.CharField(required=False, allow_blank=True)
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
-    password = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True, min_length=8)
+    password2 = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_email(self, value):
+        if CustomUser.objects.filter(email=value, is_active=True).exists():
+            raise serializers.ValidationError("Bu email allaqachon ro‘yxatdan o‘tgan.")
+        return value
 
     def validate(self, attrs):
         if attrs["password"] != attrs["password2"]:
-            raise serializers.ValidationError("Parollar bir xil emas!")
+            raise serializers.ValidationError({"password": "Parollar bir xil emas!"})
         return attrs
 
     def create(self, validated_data):
-        password = validated_data.pop("password")
-        validated_data.pop("password2", None)
+        email = validated_data["email"]
+        existing_verification = EmailVerification.objects.filter(email=email).first()
 
-        verification = None
-        code = None
-
-        existing_verification = EmailVerification.objects.filter(email=validated_data["email"]).first()
-
-        if existing_verification:
-            if existing_verification.is_expired():
-                existing_verification.delete()
-                code = str(secrets.randbelow(1000000)).zfill(6)
-                verification = EmailVerification.objects.create(
-                    email=validated_data["email"],
-                    phone_number=validated_data.get("phone_number"),
-                    first_name=validated_data.get("first_name"),
-                    last_name=validated_data.get("last_name"),
-                    password=make_password(password),
-                    code=code,
-                )
-            else:
-                code = existing_verification.code
-                verification = existing_verification
+        if existing_verification and not existing_verification.is_expired():
+            code = existing_verification.code
+            verification = existing_verification
         else:
+            if existing_verification:
+                existing_verification.delete()
+
             code = str(secrets.randbelow(1000000)).zfill(6)
             verification = EmailVerification.objects.create(
-                email=validated_data["email"],
+                email=email,
                 phone_number=validated_data.get("phone_number"),
                 first_name=validated_data.get("first_name"),
                 last_name=validated_data.get("last_name"),
-                password=make_password(password),
+                password=make_password(validated_data["password"]),
                 code=code,
             )
-        mail_subject = "Your Registration Verification Code"
-        message = f"Hello {validated_data['email']},\n\nYour verification code is: {code}"
-        email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [validated_data['email']])
-        email_obj.send()
+
+        mail_subject = "Ro'yxatdan o'tish uchun tasdiqlash kodi"
+        message = (
+            f"Salom {email},\n\n"
+            f"Sizning ro‘yxatdan o‘tish uchun tasdiqlash kodingiz: {code}\n"
+            "Kod 10 daqiqa davomida amal qiladi."
+        )
+        email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [email])
+        email_obj.send(fail_silently=False)
 
         return verification
 
