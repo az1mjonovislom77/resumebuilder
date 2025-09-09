@@ -10,7 +10,7 @@ env = environ.Env(
 
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-SECRET_KEY = env("SECRET_KEY", default="change-me")
+SECRET_KEY = 'zfa*)0=_a%8$@31wq_^&q9x0(@#jelg*@uq6yhma(=j(55wc3='
 DEBUG = True
 
 ALLOWED_HOSTS = ["*", ".railway.app", "localhost", "127.0.0.1"]
