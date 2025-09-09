@@ -40,12 +40,12 @@ class RegisterAPIView(APIView):
                 verification = serializer.save()
             except IntegrityError:
                 return Response(
-                    {"error": "This email is already registered."},
+                    {"error": "This email is already registered"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             send_verification_email(verification.email, verification.code)
             return Response(
-                {"message": "Verification code sent to your email."},
+                {"message": "Verification code sent to your email"},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,7 +60,7 @@ class VerifyEmailAPIView(APIView):
         if serializer.is_valid():
             user = serializer.save()
             return Response(
-                {"message": "Email verified successfully! You can now log in."},
+                {"message": "Email verified successfully! You can now log in"},
                 status=status.HTTP_200_OK,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -93,7 +93,7 @@ class LogoutAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        return Response({"message": "Successfully logged out."}, status=status.HTTP_200_OK)
+        return Response({"message": "Successfully logged out"}, status=status.HTTP_200_OK)
 
 
 @extend_schema(tags=['Auth'])
@@ -104,7 +104,7 @@ class ForgotPasswordAPIView(APIView):
         serializer = ForgotPasswordSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Password reset code sent to your email."}, status=status.HTTP_200_OK)
+            return Response({"message": "Password reset code sent to your email"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -116,5 +116,5 @@ class ResetPasswordAPIView(APIView):
         serializer = ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return Response({"message": "Password updated successfully."}, status=status.HTTP_200_OK)
+            return Response({"message": "Password updated successfully"}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
