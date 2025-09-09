@@ -143,7 +143,7 @@ class SocialLoginCompleteAPIView(APIView):
                 #     'refresh': str(refresh),
                 # })
                 # frontend_url = f"http://localhost:5173/oauth/callback?{params}"
-                frontend_url = f"http://localhost:5173/?access={str(refresh.access_token)}&refresh={str(refresh)}"
+                frontend_url = f"http://localhost:5173/oauth/callback?access={str(refresh.access_token)}&refresh={str(refresh)}"
                 return redirect(frontend_url)
             else:
                 return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
