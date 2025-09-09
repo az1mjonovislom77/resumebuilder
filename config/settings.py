@@ -105,7 +105,6 @@ MEDIA_ROOT = BASE_DIR / 'images/media'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Authentication backends
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'social_core.backends.github.GithubOAuth2',
