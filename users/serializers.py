@@ -1,8 +1,9 @@
 import secrets
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
-from users.models import CustomUser, EmailVerification
-
+from users.models import CustomUser, EmailVerification, PasswordResetCode
+from django.core.mail import EmailMessage
 
 class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
@@ -87,3 +88,64 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Email hali tasdiqlanmagan")
 
         return {"user": user}
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate(self, attrs):
+        email = attrs.get("email")
+        user = CustomUser.objects.filter(email=email).first()
+        if not user:
+            raise serializers.ValidationError("Foydalanuvchi topilmadi")
+        attrs["user"] = user
+        return attrs
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        code = str(secrets.randbelow(1000000)).zfill(6)
+        PasswordResetCode.objects.create(user=user, code=code)
+
+        # email yuborish
+        mail_subject = "Password Reset Code"
+        message = f"Hello {user.email},\n\nYour password reset code is: {code}"
+        email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [user.email])
+        email_obj.send()
+
+        return {"message": "Password reset code sent to your email."}
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    verification_code = serializers.CharField()
+    new_password = serializers.CharField(write_only=True)
+    new_password2 = serializers.CharField(write_only=True)
+
+    def validate(self, attrs):
+        if attrs["new_password"] != attrs["new_password2"]:
+            raise serializers.ValidationError("Parollar bir xil emas!")
+
+        user = CustomUser.objects.filter(email=attrs["email"]).first()
+        if not user:
+            raise serializers.ValidationError("Foydalanuvchi topilmadi")
+
+        code_obj = PasswordResetCode.objects.filter(user=user, code=attrs["verification_code"]).first()
+        if not code_obj:
+            raise serializers.ValidationError("Kod noto‘g‘ri")
+        if code_obj.is_expired():
+            raise serializers.ValidationError("Kod muddati tugagan")
+
+        attrs["user"] = user
+        attrs["code_obj"] = code_obj
+        return attrs
+
+    def create(self, validated_data):
+        user = validated_data["user"]
+        user.set_password(validated_data["new_password"])
+        user.save()
+
+        # ishlatilgan kodni o'chirish
+        validated_data["code_obj"].delete()
+
+        return {"message": "Parol muvaffaqiyatli yangilandi."}
+

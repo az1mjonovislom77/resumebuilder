@@ -8,9 +8,7 @@ env = environ.Env(
     DEBUG=(bool, True)
 )
 
-
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
-
 
 # Security
 SECRET_KEY = env("SECRET_KEY", default="change-me")
@@ -139,10 +137,13 @@ SOCIAL_AUTH_GITHUB_REDIRECT_URI = env(
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
 
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'  # logindan keyin redirect
+LOGOUT_REDIRECT_URL = '/'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = env("EMAIL_HOST_USER", default="")
-EMAIL_HOST_PASSWORD='dlmlfdolokvvkwtd'
+EMAIL_HOST_PASSWORD = 'dlmlfdolokvvkwtd'
