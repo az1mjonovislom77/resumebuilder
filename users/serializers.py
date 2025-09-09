@@ -51,8 +51,8 @@ class RegisterSerializer(serializers.Serializer):
             f"Sizning ro‘yxatdan o‘tish uchun tasdiqlash kodingiz: {code}\n"
             "Kod 10 daqiqa davomida amal qiladi."
         )
-        email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [email])
         try:
+            email_obj = EmailMessage(mail_subject, message, settings.EMAIL_HOST_USER, [email])
             email_obj.send(fail_silently=False)
         except Exception as e:
             print(f"Email yuborishda xatolik: {e}")
