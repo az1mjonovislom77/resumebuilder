@@ -138,7 +138,7 @@ GOOGLE_REDIRECT_URI = env(
 )
 GITHUB_REDIRECT_URI = env(
     "GITHUB_REDIRECT_URI",
-    default="http://127.0.0.1:8000/social-auth/complete/github/"
+    default="https://resumebuilder.pythonanywhere.com/social-users/complete/github/"
 )
 
 SOCIAL_AUTH_GITHUB_SCOPE = ['user:email']
