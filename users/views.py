@@ -125,7 +125,6 @@ class SocialLoginURLsAPIView(APIView):
             "github_login_url": request.build_absolute_uri(reverse('social:begin', kwargs={'backend': 'github'})),
         })
 
-
 @extend_schema(tags=['Auth'])
 class SocialLoginCompleteAPIView(APIView):
     permission_classes = [AllowAny]
@@ -134,7 +133,9 @@ class SocialLoginCompleteAPIView(APIView):
         strategy = load_strategy(request)
         social_backend = load_backend(strategy, backend, None)
         try:
-            user = social_backend.do_auth(request.GET.get('code'), request=request)
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            user = social_backend.do_auth(code, state=state, request=request)
             if user and user.is_active:
                 refresh = RefreshToken.for_user(user)
                 return Response({
@@ -145,3 +146,4 @@ class SocialLoginCompleteAPIView(APIView):
                 return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
