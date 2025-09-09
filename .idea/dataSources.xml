@@ -8,5 +8,12 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/resume</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="railway@caboose.proxy.rlwy.net" uuid="7942a44f-fb36-45c4-96c6-656743d38fdc">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://caboose.proxy.rlwy.net:35504/railway</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>

@@ -46,6 +46,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    'https://resumebuilder-production-6887.up.railway.app/'
 ]
 
 ROOT_URLCONF = 'config.urls'
