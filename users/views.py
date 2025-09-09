@@ -2,6 +2,7 @@ import secrets
 from django.core.mail import EmailMessage
 from django.conf import settings
 from drf_spectacular.utils import extend_schema
+from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 from rest_framework import status, permissions
 from rest_framework.response import Response
@@ -29,6 +30,7 @@ def send_verification_email(email, code):
 
 
 class RegisterAPIView(APIView):
+    permissions_classes = [AllowAny]
     def post(self, request):
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
