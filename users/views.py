@@ -138,12 +138,11 @@ class SocialLoginCompleteAPIView(APIView):
             user = social_backend.do_auth(code, state=state)
             if user and user.is_active:
                 refresh = RefreshToken.for_user(user)
-                # params = urlencode({
-                #     'access': str(refresh.access_token),
-                #     'refresh': str(refresh),
-                # })
-                # frontend_url = f"http://localhost:5173/oauth/callback?{params}"
-                frontend_url = f"http://localhost:5173/oauth/callback?access={str(refresh.access_token)}&refresh={str(refresh)}"
+                params = urlencode({
+                    'access': str(refresh.access_token),
+                    'refresh': str(refresh),
+                })
+                frontend_url = f"http://localhost:5173/oauth/callback?{params}"
                 return redirect(frontend_url)
             else:
                 return Response({"error": "Authentication failed"}, status=status.HTTP_400_BAD_REQUEST)
