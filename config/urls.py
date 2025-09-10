@@ -4,14 +4,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
-from users.views import SocialLoginCompleteAPIView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("users/", include(("users.urls", "users"), namespace="users")),
     path("resume/", include(("resume.urls", "resume"), namespace="resume")),
     path("social-users/", include("social_django.urls", namespace="social")),
-    path("social-users/complete/<str:backend>/", SocialLoginCompleteAPIView.as_view(), name="social-complete"),
 
     path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
