@@ -126,6 +126,7 @@ class SocialLoginURLsAPIView(APIView):
             "github_login_url": request.build_absolute_uri(reverse('social:begin', kwargs={'backend': 'github'})),
         })
 
+@extend_schema(tags=['Auth'])
 class SocialLoginCompleteAPIView(APIView):
     permission_classes = [AllowAny]
 
